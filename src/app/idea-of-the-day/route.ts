@@ -1,9 +1,9 @@
 import axios from "axios";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createSigner, withPaymentInterceptor } from "x402-axios";
 import OpenAI from "openai";
 
-export async function GET(_req: NextRequest): Promise<Response> {
+export async function GET(): Promise<Response> {
   try {
     const privateKey = process.env.PRIVATE_KEY as string | undefined;
     const openaiApiKey = process.env.OPENAI_API_KEY as string | undefined;
@@ -87,24 +87,36 @@ type NormalizedArticle = {
 };
 
 function normalizeArticles(raw: unknown): NormalizedArticle[] {
-  const list: InputArticle[] = Array.isArray((raw as any)?.articles)
-    ? (raw as any).articles
-    : Array.isArray(raw)
-    ? (raw as any)
+  const list: unknown[] = Array.isArray(raw)
+    ? raw
+    : typeof raw === "object" && raw !== null && Array.isArray((raw as Record<string, unknown>).articles)
+    ? ((raw as Record<string, unknown>).articles as unknown[])
     : [];
 
   return list
+    .map((item) => coerceInputArticle(item))
     .map((a) => {
-      const title = (a.title ?? "Untitled").toString();
-      const url = (a.url ?? a.link) as string | undefined;
+      const title = String(a.title ?? "Untitled");
+      const url = typeof a.url === "string" ? a.url : typeof a.link === "string" ? a.link : undefined;
       const summarySource =
-        a.summary ?? a.description ?? a.content ?? "";
-      const summary = summarySource
-        ? summarySource.toString().slice(0, 800)
-        : "";
-      return { title, url, summary } as NormalizedArticle;
+        typeof a.summary === "string"
+          ? a.summary
+          : typeof a.description === "string"
+          ? a.description
+          : typeof a.content === "string"
+          ? a.content
+          : "";
+      const summary = summarySource ? String(summarySource).slice(0, 800) : "";
+      return { title, url, summary };
     })
-    .filter((a) => a.title);
+    .filter((a) => Boolean(a.title));
+}
+
+function coerceInputArticle(u: unknown): InputArticle {
+  if (typeof u === "object" && u !== null) {
+    return u as InputArticle;
+  }
+  return {} as InputArticle;
 }
 
 function buildPrompt(articles: NormalizedArticle[]): string {
