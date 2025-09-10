@@ -1,6 +1,6 @@
 ## Startup Idea Agent
 
-Buy one high‑quality, research‑backed startup idea each day for $1. The agent purchases curated business news, analyzes changes that create opportunities, and returns a single best idea with TAM, why‑now, concrete first steps, and a link to the source article.
+Sell high‑quality, research‑backed startup idea each day for $1. The agent purchases curated business news, analyzes changes that create opportunities, and then sells the single best idea with TAM, why‑now, concrete first steps, and a link to the source article.
 
 ### Features
 - **Paid route (`/idea-of-the-day`)**: protected by `x402-next` middleware; costs $1 per request
@@ -19,7 +19,7 @@ npm i
 
 2) Create `.env.local`
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 Fill in your keys (see Environment Variables below).
 
@@ -32,7 +32,7 @@ Open http://localhost:3000 and click “Get today’s idea — $1”.
 ---
 
 ## Environment Variables
-Create `.env.local` with:
+Create `.env` with:
 ```
 # OpenAI (required)
 OPENAI_API_KEY=sk-...
@@ -40,7 +40,7 @@ OPENAI_API_KEY=sk-...
 # 402 payments (required)
 PRIVATE_KEY=...             # Solana devnet private key for payments
 RESOURCE_WALLET_ADDRESS=... # Wallet to receive payments
-NEXT_PUBLIC_FACILITATOR_URL=https://facilitator.x402.bot
+NEXT_PUBLIC_FACILITATOR_URL=https://facilitator.payai.network
 ```
 
 Notes:
