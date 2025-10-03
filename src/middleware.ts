@@ -24,7 +24,7 @@ import {
   SupportedEVMNetworks,
   SupportedSVMNetworks,
 } from "x402/types";
-import { useFacilitator } from "x402/verify";
+import { useFacilitator as createFacilitator } from "x402/verify";
 import { safeBase64Encode } from "x402/shared";
 
 const facilitatorUrl = process.env.NEXT_PUBLIC_FACILITATOR_URL as Resource;
@@ -125,7 +125,7 @@ export function paymentMiddleware(
   facilitator?: FacilitatorConfig,
   paywall?: PaywallConfig,
 ) {
-  const { verify, settle, supported } = useFacilitator(facilitator);
+  const { verify, settle, supported } = createFacilitator(facilitator);
   const x402Version = 1;
 
   // Pre-compile route patterns to regex and extract verbs
@@ -164,7 +164,7 @@ export function paymentMiddleware(
     const resourceUrl =
       resource || (`${request.nextUrl.protocol}//${request.nextUrl.host}${pathname}` as Resource);
 
-    let paymentRequirements: PaymentRequirements[] = [];
+    const paymentRequirements: PaymentRequirements[] = [];
 
     // TODO: create a shared middleware function to build payment requirements
     // evm networks
